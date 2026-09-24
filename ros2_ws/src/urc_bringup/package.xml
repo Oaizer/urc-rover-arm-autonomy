@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>urc_bringup</name><version>0.1.0</version>
+  <description>Safe launch entry points for reusable URC components.</description>
+  <maintainer email="team@example.com">URC team</maintainer><license>Apache-2.0</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>launch</exec_depend><exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>urc_interfaces</exec_depend><exec_depend>urc_kinematics</exec_depend>
+  <exec_depend>urc_can</exec_depend><exec_depend>urc_perception</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

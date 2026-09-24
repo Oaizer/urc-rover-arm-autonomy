@@ -1,0 +1,97 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 30; 34; 42
+    Fixed Frame: world
+    Frame Rate: 30
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Ground
+      Enabled: true
+      Cell Size: 0.1
+      Plane Cell Count: 20
+      Color: 90; 100; 110
+    - Class: rviz_default_plugins/RobotModel
+      Name: Arm - measured joint states
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        Depth: 1
+      Visual Enabled: true
+      Collision Enabled: false
+      Alpha: 1
+    - Class: rviz_default_plugins/TF
+      Name: Joint frames
+      Enabled: false
+      Show Axes: true
+      Show Names: true
+      Marker Scale: 0.12
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Synthetic scene - ground truth
+      Enabled: true
+      Topic:
+        Value: /sim/scene
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        Depth: 5
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Mapped tags and registered panel
+      Enabled: true
+      Topic:
+        Value: /perception/markers
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        Depth: 5
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Mission progress
+      Enabled: true
+      Topic:
+        Value: /mission/markers
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        Depth: 1
+    - Class: rviz_default_plugins/InteractiveMarkers
+      Name: Drag target and panel
+      Enabled: true
+      Interactive Markers Namespace: /sim/controls
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: true
+    - Class: rviz_default_plugins/Image
+      Name: Wrist camera - ArUco overlay
+      Enabled: true
+      Topic:
+        Value: /sim_camera/image_annotated
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 1
+      Normalize Range: true
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 1.8
+      Focal Point:
+        X: 0.45
+        Y: 0.0
+        Z: 0.23
+      Pitch: 0.4
+      Yaw: 0.9
+      Target Frame: world
+Window Geometry:
+  Width: 1400
+  Height: 900
+  X: 30
+  Y: 30

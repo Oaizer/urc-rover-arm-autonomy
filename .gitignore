@@ -1,0 +1,22 @@
+# ROS 2 and Python build output
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/*.egg-info/
+.ros_log/
+.venv/
+
+# Local test output and captured telemetry
+*.jsonl
+offline_test_output.png
+stress_test_montage.png
+stress_test_results.json
+outputs/urc-keyboard-autonomy/active_survey_result.json
+ros2_ws/rviz-autonomy.png
+work/rviz-test.png
+work/rviz-render-check.png
+work/urc2027-p5.png
+work/tag-ik-simulator-rendered.html

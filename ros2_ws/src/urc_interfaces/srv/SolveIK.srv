@@ -1,0 +1,16 @@
+# Target in arm base coordinates, metres; unit quaternion; radians seed.
+geometry_msgs/Pose target
+float64[6] seed
+# Set true for tasks that must not relax tool orientation (e.g. lock insertion).
+bool require_orientation
+# Zero disables this limit. Otherwise every joint must stay within this many radians of seed.
+float64 max_joint_delta_rad
+---
+bool success
+string message
+float64[6] positions
+float64 position_error_m
+float64 orientation_error_rad
+# True means position succeeded but requested orientation was not enforced.
+bool orientation_relaxed
+geometry_msgs/Pose achieved_pose

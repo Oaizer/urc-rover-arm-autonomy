@@ -1,0 +1,74 @@
+{
+  "ik_project": "../i-need-to-design-an-inverse",
+  "camera": {
+    "device": "/dev/video0",
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "camera_matrix": null,
+    "distortion": null,
+    "dictionary": "DICT_4X4_50",
+    "marker_size_mm": 20.0
+  },
+  "keyboard": {
+    "width_mm": 350.0,
+    "height_mm": 125.0,
+    "tag_centers_mm": {},
+    "key_centers_mm": {},
+    "display_roi_px": null
+  },
+  "survey": {
+    "allowed_marker_ids": [0, 1, 2, 3, 4],
+    "min_unique_tags": 3,
+    "min_total_observations": 5,
+    "min_viewpoints": 2,
+    "min_viewpoint_separation_deg": 8.0,
+    "max_reprojection_error_px": 1.5,
+    "min_marker_pixel_area": 100.0,
+    "max_timestamp_delta_ms": 10.0,
+    "min_triangle_area_mm2": 500.0,
+    "max_plane_rms_mm": 3.0,
+    "max_registration_rms_mm": 3.0,
+    "max_position_uncertainty_mm": 2.0,
+    "require_normal_faces_base": true,
+    "viewpoints": [
+      {"name": "center", "yaw_deg": 0.0, "pitch_deg": 0.0, "joint_positions_deg": null},
+      {"name": "left", "yaw_deg": -15.0, "pitch_deg": 0.0, "joint_positions_deg": null},
+      {"name": "right", "yaw_deg": 15.0, "pitch_deg": 0.0, "joint_positions_deg": null},
+      {"name": "up", "yaw_deg": 0.0, "pitch_deg": 12.0, "joint_positions_deg": null},
+      {"name": "down", "yaw_deg": 0.0, "pitch_deg": -12.0, "joint_positions_deg": null},
+      {"name": "left_up", "yaw_deg": -15.0, "pitch_deg": 12.0, "joint_positions_deg": null},
+      {"name": "right_up", "yaw_deg": 15.0, "pitch_deg": 12.0, "joint_positions_deg": null},
+      {"name": "left_down", "yaw_deg": -15.0, "pitch_deg": -12.0, "joint_positions_deg": null},
+      {"name": "right_down", "yaw_deg": 15.0, "pitch_deg": -12.0, "joint_positions_deg": null}
+    ]
+  },
+  "arm": {
+    "joint_count": 6,
+    "moteus_ids": [],
+    "output_ratios": [],
+    "zero_offsets_rad": [],
+    "direction_signs": [],
+    "limits_rad": [],
+    "T_j5_camera": null,
+    "camera_rotates_with_j5": true,
+    "T_wrist_tip": null
+  },
+  "motion": {
+    "clearance_mm": 20.0,
+    "press_speed_mm_s": 2.0,
+    "torque_limit": 0.0,
+    "approach_speed_rad_s": 0.25,
+    "max_tracking_error_rad": 0.08,
+    "feedback_timeout_ms": 100,
+    "observation_stability_frames": 5,
+    "max_corrections": 2,
+    "mission_timeout_s": 120,
+    "settle_timeout_s": 5.0,
+    "telemetry_path": "telemetry.jsonl"
+  },
+  "can": {
+    "serial_port": "/dev/ttyACM0",
+    "bus_timeout_s": 0.1
+  }
+}

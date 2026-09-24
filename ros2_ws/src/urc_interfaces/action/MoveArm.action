@@ -1,0 +1,16 @@
+# Pose in the configured arm base, metres; unit quaternion. Nonzero capture/command stamp.
+geometry_msgs/PoseStamped target
+bool require_orientation
+# Zero selects the controller default.
+float64 max_joint_delta_rad
+float64 timeout_s
+# 'mission' reserves autonomous requests; other values are manual requests.
+string source
+---
+bool success
+string message
+bool orientation_relaxed
+geometry_msgs/PoseStamped achieved_pose
+---
+string phase
+geometry_msgs/PoseStamped current_pose

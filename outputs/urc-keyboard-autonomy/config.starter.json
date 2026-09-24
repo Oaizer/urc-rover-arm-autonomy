@@ -1,0 +1,95 @@
+{
+  "profile_name": "starter-simulation",
+  "calibration_status": "SIMULATION_ONLY",
+  "ik_project": "C:/Users/oaize/Documents/Codex/2026-09-19/i-need-to-design-an-inverse",
+  "camera": {
+    "device": "/dev/video0",
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "camera_matrix": [[900.0, 0.0, 640.0], [0.0, 900.0, 360.0], [0.0, 0.0, 1.0]],
+    "distortion": [0.0, 0.0, 0.0, 0.0, 0.0],
+    "dictionary": "DICT_4X4_50",
+    "marker_size_mm": 20.0
+  },
+  "keyboard": {
+    "width_mm": 350.0,
+    "height_mm": 125.0,
+    "tag_centers_mm": {
+      "0": [-155.0, -50.0],
+      "1": [155.0, -50.0],
+      "2": [155.0, 50.0],
+      "3": [-155.0, 50.0],
+      "4": [0.0, 0.0]
+    },
+    "key_centers_mm": {
+      "Q": [-85.725, -30.0], "W": [-66.675, -30.0], "E": [-47.625, -30.0],
+      "R": [-28.575, -30.0], "T": [-9.525, -30.0], "Y": [9.525, -30.0],
+      "U": [28.575, -30.0], "I": [47.625, -30.0], "O": [66.675, -30.0],
+      "P": [85.725, -30.0],
+      "A": [-76.2, 0.0], "S": [-57.15, 0.0], "D": [-38.1, 0.0],
+      "F": [-19.05, 0.0], "G": [0.0, 0.0], "H": [19.05, 0.0],
+      "J": [38.1, 0.0], "K": [57.15, 0.0], "L": [76.2, 0.0],
+      "Z": [-57.15, 30.0], "X": [-38.1, 30.0], "C": [-19.05, 30.0],
+      "V": [0.0, 30.0], "B": [19.05, 30.0], "N": [38.1, 30.0],
+      "M": [57.15, 30.0],
+      "SPACE": [0.0, 55.0],
+      "BACKSPACE": [142.0, -30.0]
+    },
+    "display_roi_px": [850, 40, 390, 130]
+  },
+  "survey": {
+    "allowed_marker_ids": [0, 1, 2, 3, 4],
+    "min_unique_tags": 3,
+    "min_total_observations": 5,
+    "min_viewpoints": 2,
+    "min_viewpoint_separation_deg": 8.0,
+    "max_reprojection_error_px": 1.5,
+    "min_marker_pixel_area": 100.0,
+    "max_timestamp_delta_ms": 10.0,
+    "min_triangle_area_mm2": 500.0,
+    "max_plane_rms_mm": 3.0,
+    "max_registration_rms_mm": 3.0,
+    "max_position_uncertainty_mm": 2.0,
+    "require_normal_faces_base": true,
+    "viewpoints": [
+      {"name": "center", "yaw_deg": 0.0, "pitch_deg": 0.0, "joint_positions_deg": [0.0, -20.0, 40.0, 0.0, -20.0, 0.0]},
+      {"name": "left", "yaw_deg": -15.0, "pitch_deg": 0.0, "joint_positions_deg": [-12.0, -20.0, 40.0, 0.0, -20.0, 0.0]},
+      {"name": "right", "yaw_deg": 15.0, "pitch_deg": 0.0, "joint_positions_deg": [12.0, -20.0, 40.0, 0.0, -20.0, 0.0]},
+      {"name": "up", "yaw_deg": 0.0, "pitch_deg": 12.0, "joint_positions_deg": [0.0, -10.0, 30.0, 0.0, -20.0, 0.0]},
+      {"name": "down", "yaw_deg": 0.0, "pitch_deg": -12.0, "joint_positions_deg": [0.0, -30.0, 50.0, 0.0, -20.0, 0.0]},
+      {"name": "left_up", "yaw_deg": -15.0, "pitch_deg": 12.0, "joint_positions_deg": [-12.0, -10.0, 30.0, 0.0, -20.0, 0.0]},
+      {"name": "right_up", "yaw_deg": 15.0, "pitch_deg": 12.0, "joint_positions_deg": [12.0, -10.0, 30.0, 0.0, -20.0, 0.0]},
+      {"name": "left_down", "yaw_deg": -15.0, "pitch_deg": -12.0, "joint_positions_deg": [-12.0, -30.0, 50.0, 0.0, -20.0, 0.0]},
+      {"name": "right_down", "yaw_deg": 15.0, "pitch_deg": -12.0, "joint_positions_deg": [12.0, -30.0, 50.0, 0.0, -20.0, 0.0]}
+    ]
+  },
+  "arm": {
+    "joint_count": 6,
+    "moteus_ids": [1, 2, 3, 4, 5, 6],
+    "output_ratios": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    "zero_offsets_rad": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "direction_signs": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    "limits_rad": [[-3.14159, 3.14159], [-2.0944, 2.0944], [-2.0944, 2.0944], [-3.14159, 3.14159], [-2.0944, 2.0944], [-3.14159, 3.14159]],
+    "T_j5_camera": [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 60.0], [0.0, 0.0, 0.0, 1.0]],
+    "camera_rotates_with_j5": true,
+    "T_wrist_tip": [[1.0, 0.0, 0.0, 130.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+  },
+  "motion": {
+    "clearance_mm": 20.0,
+    "press_speed_mm_s": 2.0,
+    "torque_limit": 0.0,
+    "approach_speed_rad_s": 0.15,
+    "max_tracking_error_rad": 0.05,
+    "feedback_timeout_ms": 100,
+    "observation_stability_frames": 3,
+    "max_corrections": 2,
+    "mission_timeout_s": 120,
+    "settle_timeout_s": 8.0,
+    "telemetry_path": "telemetry-starter.jsonl"
+  },
+  "can": {
+    "serial_port": "/dev/ttyACM0",
+    "bus_timeout_s": 0.1
+  }
+}

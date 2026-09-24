@@ -1,0 +1,20 @@
+# Override dictionary explicitly in launch/CLI. No competition IDs or sizes assumed.
+/**/usb_camera:
+  ros__parameters:
+    width: 640
+    height: 480
+    capture_fps: 30.0
+    publish_fps: 30.0
+    fourcc: MJPG
+    frame_id: camera_optical_frame
+/**/aruco_detector:
+  ros__parameters:
+    detection_fps: 30.0
+    max_image_age_s: 0.25
+    # Add your measured outer black-square sizes, e.g. tag_sizes: ['7:0.15'].
+    ambiguity_policy: reject
+    ambiguity_gap_px: 0.2
+    ambiguity_ratio: 1.5
+    max_reprojection_error_px: 3.0
+    publish_annotated: false
+    annotated_fps: 5.0

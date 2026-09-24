@@ -1,0 +1,6 @@
+/**:
+  ros__parameters:
+    publish_annotated: true
+    annotated_fps: 5.0
+    detection_fps: 30.0
+    ambiguity_policy: reject

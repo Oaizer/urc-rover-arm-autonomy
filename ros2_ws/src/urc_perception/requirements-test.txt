@@ -1,0 +1,5 @@
+# Offline vision tests only; DO NOT pip-install over ROS cv_bridge's system OpenCV.
+numpy>=1.23
+opencv-contrib-python>=4.6
+PyYAML>=6
+pytest>=7

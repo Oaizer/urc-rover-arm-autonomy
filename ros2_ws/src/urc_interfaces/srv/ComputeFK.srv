@@ -1,0 +1,4 @@
+# Joint positions in radians. Pose is arm base <- configured tool.
+float64[6] positions
+---
+geometry_msgs/Pose pose
