@@ -4,6 +4,7 @@
 Run `start_sim.ps1` in PowerShell to build and open the hardware-free arm demo.
 The complete perception-to-motion hover demo is documented in [AUTONOMY.md](AUTONOMY.md).
 The controller-manager layout and hardware boundary are in [ROS2_CONTROL.md](ROS2_CONTROL.md).
+Two 10-second recordings of the running mock demo are in [media/README.md](media/README.md).
 
 Reusable foundations for the keyboard and physical-key missions. This workspace
 runs a simulated tag-acquisition and hover mission. Competition typing/key
