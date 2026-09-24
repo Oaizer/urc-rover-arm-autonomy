@@ -1,7 +1,8 @@
 # ROS autonomy simulation
 
-The camera renderer, perception, motion planning and joint executor are separate
-ROS nodes. No CAN node runs in this launch.
+The camera renderer, perception, and motion planning are separate ROS nodes.
+The arm is managed by ros2_control with a mock six-joint hardware component.
+No CAN node runs in this launch.
 
 ```text
 urc_simulator -- /sim_camera/image_raw --> aruco_detector
@@ -20,11 +21,13 @@ urc_simulator -- /sim_camera/image_raw --> aruco_detector
                                               |
                        /solve_ik service <--> urc_kinematics
                                               |
-                   /arm/follow_joint_trajectory (standard ROS action)
+          /arm_trajectory_controller/follow_joint_trajectory
                                               v
-                                      sim_joint_executor
+                   joint_trajectory_controller (controller_manager)
                                               |
-                                         /joint_states
+                     mock_components/GenericSystem (six joints)
+                                              |
+                       joint_state_broadcaster -> /joint_states
                                               v
                                  RViz + camera renderer
 ```
@@ -92,7 +95,9 @@ timestamp goals from `/clock`, not the laptop's wall clock.
 The simulation publishes a steady, real-time-paced `/clock`. Every launched node,
 including RViz, uses it; Windows/WSL wall-clock corrections therefore do not age
 otherwise fresh observations. Real hardware launches do not use this clock.
-Monotonic command deadlines and the executor heartbeat still protect against stalls.
+Monotonic command deadlines and feedback freshness checks still protect mission
+requests against stalls. The mock component mirrors commanded state; it does not
+simulate motor inertia, CAN faults, or a physical stop.
 
 Raw perception stays at 640 x 480 grayscale. Only the annotated preview is reduced
 to 320 x 240 at 5 Hz. OpenCV uses one worker thread. The local Fast DDS profile
@@ -102,10 +107,11 @@ It is for this laptop simulation, not a multi-computer hardware deployment.
 The controller reads fresh `/joint_states`, calls IK, applies the 1.5-radian
 per-joint step bound, constructs a rest-to-rest quintic trajectory, and sends
 the trajectory action. It reports progress and the achieved pose. It cancels
-on stale joint feedback, a deadline, pause, or action cancellation. The
-simulator enforces velocity/acceleration limits and holds on controller
-heartbeat loss. Cancel/hold is an instantaneous simulation operation; it is
-not a physical braking model.
+on stale joint feedback, a deadline, pause, or action cancellation. The planned
+rest-to-rest trajectory has bounded velocity and acceleration. The standard
+trajectory controller interpolates it and applies configured tracking tolerances.
+The mock hardware reports commanded positions and velocities as state; cancel/hold
+in this testbed is not a physical braking model.
 
 ## Interfaces
 
@@ -121,19 +127,22 @@ not a physical braking model.
 | `/arm/target_pose` | PoseStamped topic, manual target input | Controller |
 | `/arm/move_to_pose` | MoveArm action | Controller |
 | `/solve_ik`, `/compute_fk` | SolveIK, ComputeFK services | Kinematics |
-| `/arm/follow_joint_trajectory` | control_msgs/FollowJointTrajectory action | Simulated executor |
+| `/arm_trajectory_controller/follow_joint_trajectory` | control_msgs/FollowJointTrajectory action | joint_trajectory_controller |
 | `/arm/status`, `/arm/achieved_pose` | String, PoseStamped topics | Controller |
 | `/arm/pause` | SetBool service | Controller |
 | `/arm/reset`, `/arm/demo` | Trigger services | Controller |
-| `/joint_states` | JointState topic | Simulated executor, sole publisher |
+| `/joint_states` | JointState topic | joint_state_broadcaster, sole publisher |
+| `/controller_manager/*` | ros2_control management services | controller_manager |
 | `/tf`, `/tf_static` | TF topics | robot_state_publisher |
 | `/clock` | rosgraph_msgs/Clock topic | Steady simulation clock |
 
-The simulation backend supports two rest-to-rest trajectory points with zero
-endpoint velocities/accelerations; it rejects unsupported trajectories rather
-than silently changing their meaning. The controller uses that subset of the
-standard FollowJointTrajectory action. A future hardware backend should expose
-the same action and joint feedback, with its own commissioned limits/watchdog.
+The URDF declares six position/velocity command and state interfaces for
+`mock_components/GenericSystem`. `config/controllers.yaml` configures the
+controller manager at 100 Hz, the joint-state broadcaster and the trajectory
+controller. The pose controller keeps the same two-point rest-to-rest command
+contract. The old Python simulated executor remains in source for reference but
+is not launched. Real motors require a commissioned ros2_control hardware
+component in place of the mock and an independent safe-stop design.
 
 ## Registration and recovery
 
@@ -162,8 +171,10 @@ ros2 topic pub --once /sim/visible_tag_ids std_msgs/msg/Int32MultiArray '{data: 
 # Simulate a lost camera, then restore it with data: true.
 ros2 service call /sim/camera_enabled std_srvs/srv/SetBool '{data: false}'
 
-# Simulate missing joint feedback, then restore it with data: true.
-ros2 service call /sim/feedback_enabled std_srvs/srv/SetBool '{data: false}'
+# Stop joint-state publication through the controller manager (restore with
+# activate_controllers: [joint_state_broadcaster]). Do this only in simulation.
+ros2 service call /controller_manager/switch_controller controller_manager_msgs/srv/SwitchController \
+  '{deactivate_controllers: [joint_state_broadcaster], strictness: 2, timeout: {sec: 3}}'
 ```
 
 After sourcing ROS and the workspace, run:

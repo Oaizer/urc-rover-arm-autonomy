@@ -7,6 +7,9 @@
   <exec_depend>rclpy</exec_depend><exec_depend>urc_interfaces</exec_depend>
   <exec_depend>rosgraph_msgs</exec_depend>
   <exec_depend>urc_autonomy</exec_depend><exec_depend>control_msgs</exec_depend><exec_depend>trajectory_msgs</exec_depend>
+  <exec_depend>ros2_control</exec_depend><exec_depend>controller_manager</exec_depend>
+  <exec_depend>controller_manager_msgs</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend><exec_depend>joint_trajectory_controller</exec_depend>
   <exec_depend>urc_kinematics</exec_depend><exec_depend>urc_description</exec_depend><exec_depend>urc_perception</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend><exec_depend>rviz2</exec_depend>
   <exec_depend>interactive_markers</exec_depend><exec_depend>visualization_msgs</exec_depend>

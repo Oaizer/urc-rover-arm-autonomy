@@ -10,6 +10,7 @@ from urc_kinematics.core import AXES, load_config
 
 CAMERA_TRANSLATION = np.array([0.0, 0.05, 0.0])
 CAMERA_ROTATION = np.array([[0., 0., 1.], [0., -1., 0.], [1., 0., 0.]])
+SIM_START = np.array([0., .5, -1., 0., .5, 0.])
 
 
 def nums(values):
@@ -50,7 +51,7 @@ def fixed(robot, name, parent, child, xyz=(0, 0, 0), rpy=(0, 0, 0)):
     origin(joint, xyz, rpy)
 
 
-def make_urdf(config_path, include_sim_camera=False):
+def make_urdf(config_path, include_sim_camera=False, control_backend=None):
     model, config = load_config(config_path)
     robot = ET.Element('robot', name='urc_yzzxzx')
     world = ET.SubElement(robot, 'link', name='world')
@@ -89,4 +90,17 @@ def make_urdf(config_path, include_sim_camera=False):
         visual_box(camera, [.036, .026, .030], [0, 0, 0], [.18, .20, .22, 1])
         fixed(robot, 'sim_camera_mount', 'arm_joint5_output', 'sim_camera_optical_frame',
               CAMERA_TRANSLATION, [np.pi, -np.pi/2, 0])
+    if control_backend is not None:
+        if control_backend != 'mock':
+            raise ValueError('Only the non-actuating mock ros2_control backend is commissioned')
+        control = ET.SubElement(robot, 'ros2_control', name='URCMockArm', type='system')
+        hardware = ET.SubElement(control, 'hardware')
+        ET.SubElement(hardware, 'plugin').text = 'mock_components/GenericSystem'
+        for index in range(6):
+            joint = ET.SubElement(control, 'joint', name=f'joint_{index+1}')
+            ET.SubElement(joint, 'command_interface', name='position')
+            ET.SubElement(joint, 'command_interface', name='velocity')
+            position = ET.SubElement(joint, 'state_interface', name='position')
+            ET.SubElement(position, 'param', name='initial_value').text = nums([SIM_START[index]])
+            ET.SubElement(joint, 'state_interface', name='velocity')
     return ET.tostring(robot, encoding='unicode')

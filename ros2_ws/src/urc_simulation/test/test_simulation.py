@@ -51,6 +51,27 @@ def test_physical_description_does_not_invent_camera():
     assert 'sim_camera' not in make_urdf(CONFIG)
 
 
+def test_mock_ros2_control_interfaces_match_trajectory_controller():
+    root = ET.fromstring(make_urdf(CONFIG, include_sim_camera=True, control_backend='mock'))
+    control = root.find('ros2_control')
+    assert control.get('type') == 'system'
+    assert control.findtext('hardware/plugin') == 'mock_components/GenericSystem'
+    joints = control.findall('joint')
+    assert [j.get('name') for j in joints] == [f'joint_{i}' for i in range(1, 7)]
+    for joint, expected in zip(joints, START):
+        assert [x.get('name') for x in joint.findall('command_interface')] == ['position', 'velocity']
+        states = joint.findall('state_interface')
+        assert [x.get('name') for x in states] == ['position', 'velocity']
+        assert float(states[0].findtext('param')) == expected
+    path = Path(__file__).resolve().parents[1] / 'config' / 'controllers.yaml'
+    config = yaml.safe_load(path.read_text())
+    controller = config['arm_trajectory_controller']['ros__parameters']
+    assert controller['joints'] == [j.get('name') for j in joints]
+    assert controller['command_interfaces'] == controller['state_interfaces'] == ['position', 'velocity']
+    assert root.find('ros2_control') is not None
+    assert ET.fromstring(make_urdf(CONFIG)).find('ros2_control') is None
+
+
 def test_rviz_jazzy_interactive_namespace():
     path = Path(__file__).resolve().parents[1] / 'config' / 'arm.rviz'
     config = yaml.safe_load(path.read_text())

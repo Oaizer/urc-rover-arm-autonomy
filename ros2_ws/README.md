@@ -3,6 +3,7 @@
 **Local Linux/RViz test environment:** see [LINUX_TESTING.md](LINUX_TESTING.md).
 Run `start_sim.ps1` in PowerShell to build and open the hardware-free arm demo.
 The complete perception-to-motion hover demo is documented in [AUTONOMY.md](AUTONOMY.md).
+The controller-manager layout and hardware boundary are in [ROS2_CONTROL.md](ROS2_CONTROL.md).
 
 Reusable foundations for the keyboard and physical-key missions. This workspace
 runs a simulated tag-acquisition and hover mission. Competition typing/key
@@ -19,7 +20,7 @@ handling and real motor actuation remain separate work.
 | `urc_bringup` | Launch the reusable components together |
 | `urc_description` | Generate the visual arm URDF from the same model as IK |
 | `urc_autonomy` | Timestamped tag mapping, fixture registration, hover mission and motion supervision |
-| `urc_simulation` | Interactive RViz, synthetic camera/environment and simulated trajectory action executor |
+| `urc_simulation` | Interactive RViz, synthetic camera/environment and ros2_control mock arm |
 
 The earlier standalone scripts in `outputs/` are unchanged. This is a separate
 workspace; copying it does not require the older IK project's absolute path.
@@ -37,8 +38,8 @@ workspace; copying it does not require the older IK project's absolute path.
   Consumers must check `pose_valid`; ambiguous poses must not drive the arm.
 - The simulator supplies an explicitly synthetic camera-to-J5 transform.
   Real-camera use requires measured calibration before transforming observations.
-- No lock/key mission, grasping, collision planner, MoveIt plugin, ros2_control
-  actuation plugin, force control or video web UI is included in this increment.
+- No lock/key mission, grasping, collision planner, MoveIt plugin, physical
+  ros2_control hardware plugin, force control or video web UI is included.
 
 ## Build on Ubuntu 24.04 / ROS 2 Jazzy
 

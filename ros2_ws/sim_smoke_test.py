@@ -60,10 +60,16 @@ def main():
         future = demo.call_async(Trigger.Request())
         spin(node, future.done)
         assert future.result().success
-        spin(node, lambda: np.linalg.norm(np.array(states[-1].position) - initial) > .05)
+        try:
+            spin(node, lambda: np.linalg.norm(np.array(states[-1].position) - initial) > .05)
+        except AssertionError:
+            print('Last arm status:', [m.data for m in status[-5:]], flush=True)
+            print('Last joints:', states[-1].position, states[-1].velocity, flush=True)
+            raise
         spin(node, lambda: status and 'target reached' in status[-1].data)
         np.testing.assert_allclose(states[-1].position, [.12, .42, -.88, .12, .46, .08], atol=.01)
-        assert max(abs(v) for m in states for v in m.velocity) <= .351
+        measured_max_velocity = max(abs(v) for m in states for v in m.velocity)
+        assert measured_max_velocity <= .351, f'mock reported {measured_max_velocity:.3f} rad/s'
         print('PASS IK service -> bounded smooth joint movement -> live TF', flush=True)
 
         pause = node.create_client(SetBool, '/sim/pause')

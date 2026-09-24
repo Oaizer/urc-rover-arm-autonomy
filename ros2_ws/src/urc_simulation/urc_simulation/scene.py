@@ -6,7 +6,7 @@ rolling shutter, lens blur, physics or contact simulation is claimed.
 import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
-from urc_description.model import CAMERA_TRANSLATION, CAMERA_ROTATION
+from urc_description.model import CAMERA_TRANSLATION, CAMERA_ROTATION, SIM_START
 from urc_perception.core import square_points
 
 K = np.array([[600., 0., 320.], [0., 600., 240.], [0., 0., 1.]])
@@ -15,7 +15,7 @@ TAG_CENTERS = {0: [-.05, .03, 0], 1: [.05, .03, 0],
                2: [.05, -.03, 0], 3: [-.05, -.03, 0]}
 BOARD_POSITION = np.array([.82, .19, 0.0])
 BOARD_ROTATION = np.array([[0., 0., -1.], [0., 1., 0.], [1., 0., 0.]])
-START = np.array([0., .5, -1., 0., .5, 0.])
+START = SIM_START.copy()
 
 
 def camera_pose(model, q):

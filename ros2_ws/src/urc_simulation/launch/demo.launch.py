@@ -1,4 +1,4 @@
-"""Isolated kinematic testbed. Intentionally launches NO physical CAN/camera."""
+"""Isolated ros2_control mock arm with synthetic vision. No physical CAN/camera."""
 from pathlib import Path
 import os
 from ament_index_python.packages import get_package_share_directory
@@ -19,8 +19,9 @@ def generate_launch_description():
 
     def nodes(context):
         config = LaunchConfiguration('ik_config').perform(context)
-        description = make_urdf(config, include_sim_camera=True)
+        description = make_urdf(config, include_sim_camera=True, control_backend='mock')
         fixture = LaunchConfiguration('fixture_path').perform(context)
+        controllers = str(share / 'config' / 'controllers.yaml')
         processes = [
             Node(package='urc_simulation', executable='simulation_clock', output='screen'),
             Node(package='robot_state_publisher', executable='robot_state_publisher',
@@ -28,9 +29,10 @@ def generate_launch_description():
             Node(package='urc_kinematics', executable='kinematics_node',
                  parameters=[{'config_path': config, 'publish_tcp_tf': False}], output='screen'),
             Node(package='urc_autonomy', executable='arm_controller',
-                 parameters=[{'config_path': config}], output='screen'),
-            Node(package='urc_simulation', executable='joint_executor',
-                 parameters=[{'config_path': config}], output='screen'),
+                 parameters=[{'config_path': config,
+                              'trajectory_action': '/arm_trajectory_controller/follow_joint_trajectory'}], output='screen'),
+            Node(package='controller_manager', executable='ros2_control_node',
+                 parameters=[controllers], output='screen'),
             Node(package='urc_autonomy', executable='tag_mapper',
                  parameters=[{'config_path': config, 'fixture_path': fixture}],
                  remappings=[('tag_detections', '/sim_camera/tag_detections'),
@@ -48,12 +50,26 @@ def generate_launch_description():
             Node(package='rviz2', executable='rviz2', arguments=['-d', str(share / 'config' / 'arm.rviz')],
                  condition=IfCondition(LaunchConfiguration('rviz')), output='screen'),
         ]
+        spawners = [
+            Node(package='controller_manager', executable='spawner',
+                 arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager',
+                            '--controller-manager-timeout', '30'], output='screen'),
+            Node(package='controller_manager', executable='spawner',
+                 arguments=['arm_trajectory_controller', '--controller-manager', '/controller_manager',
+                            '--controller-manager-timeout', '30'], output='screen'),
+        ]
         # Closing RViz stops this local testbed; a crashed critical node cannot
         # leave a frozen arm looking like a live simulation.
         handlers = [RegisterEventHandler(OnProcessExit(target_action=process,
                     on_exit=[EmitEvent(event=Shutdown(reason='Simulation component exited'))]))
                     for process in processes]
-        return processes + handlers
+        def stop_if_spawner_fails(event, context):
+            if event.returncode:
+                return [EmitEvent(event=Shutdown(reason='ros2_control controller failed to start'))]
+            return []
+        handlers.extend(RegisterEventHandler(OnProcessExit(target_action=spawner,
+                         on_exit=stop_if_spawner_fails)) for spawner in spawners)
+        return processes + spawners + handlers
     return LaunchDescription([
         SetEnvironmentVariable('FASTRTPS_DEFAULT_PROFILES_FILE',
             os.environ.get('FASTRTPS_DEFAULT_PROFILES_FILE', str(share / 'config' / 'fastdds.xml'))),

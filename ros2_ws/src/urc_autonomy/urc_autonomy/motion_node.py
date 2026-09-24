@@ -38,7 +38,10 @@ class Controller(Node):
         self.achieved = self.create_publisher(PoseStamped, '/arm/achieved_pose', 1)
         self.create_timer(.1, self.publish)
         self.ik = self.create_client(SolveIK, '/solve_ik', callback_group=self.group)
-        self.backend = ActionClient(self, FollowJointTrajectory, '/arm/follow_joint_trajectory', callback_group=self.group)
+        trajectory_action = self.declare_parameter('trajectory_action', '/arm/follow_joint_trajectory').value
+        if not isinstance(trajectory_action, str) or not trajectory_action.startswith('/'):
+            raise ValueError('trajectory_action must be an absolute ROS action name')
+        self.backend = ActionClient(self, FollowJointTrajectory, trajectory_action, callback_group=self.group)
         self.server = ActionServer(self, MoveArm, '/arm/move_to_pose', self.execute,
                                    goal_callback=self.accept, cancel_callback=lambda _: CancelResponse.ACCEPT,
                                    callback_group=self.group)
@@ -74,10 +77,21 @@ class Controller(Node):
                      and 0 <= goal.timeout_s <= 120.)
         except (ValueError, TypeError):
             valid = False
-        if (not valid or self.busy or self.paused or not self.feedback.fresh(self.now())
+        now = self.now()
+        feedback_fresh = self.feedback.fresh(now)
+        if (not valid or self.busy or self.paused or not feedback_fresh
                 or (self.autonomous and goal.source != 'mission')):
             if not self.busy:
-                self.state = 'REJECTED | invalid/stale target, paused, or autonomy owns the arm'
+                if not valid:
+                    reason = 'invalid/stale target'
+                elif self.paused:
+                    reason = 'paused'
+                elif not feedback_fresh:
+                    reason = f'joint feedback stale (ROS age={now-self.feedback.stamp:.3f}s, receipt age={time.monotonic()-self.feedback.received:.3f}s)'
+                else:
+                    reason = 'autonomy owns the arm'
+                self.state = 'REJECTED | ' + reason
+                self.get_logger().warning(self.state)
             return GoalResponse.REJECT
         self.busy = True
         return GoalResponse.ACCEPT

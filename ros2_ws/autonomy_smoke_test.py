@@ -17,6 +17,7 @@ from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import JointState, Image
 from std_msgs.msg import String, Int32MultiArray
 from std_srvs.srv import Trigger, SetBool
+from controller_manager_msgs.srv import ListControllers, SwitchController
 from visualization_msgs.msg import InteractiveMarkerFeedback
 from urc_interfaces.msg import PanelObservation, TagDetections
 from urc_interfaces.action import MoveArm
@@ -45,6 +46,22 @@ def call(node, service_type, name, request):
     node.destroy_client(client)
     assert value.success, value.message
     return value
+
+
+def switch_broadcaster(node, activate):
+    client = node.create_client(SwitchController, '/controller_manager/switch_controller')
+    assert client.wait_for_service(timeout_sec=5)
+    name = 'joint_state_broadcaster'
+    request = SwitchController.Request(
+        activate_controllers=[name] if activate else [],
+        deactivate_controllers=[] if activate else [name],
+        strictness=SwitchController.Request.STRICT,
+    )
+    request.timeout.sec = 3
+    future = client.call_async(request)
+    spin(node, future.done)
+    assert future.result().ok, future.result().message
+    node.destroy_client(client)
 
 
 def main():
@@ -81,6 +98,19 @@ def main():
         spin(node, lambda: states and panels and panels[-1].valid and status, timeout=90)
         assert node.count_publishers('/joint_states') == 1
         assert 'urc_can' not in node.get_node_names()
+        controllers = node.create_client(ListControllers, '/controller_manager/list_controllers')
+        assert controllers.wait_for_service(timeout_sec=5)
+        required = {'joint_state_broadcaster': 'active', 'arm_trajectory_controller': 'active'}
+        controller_deadline = time.monotonic() + 40
+        while True:
+            listed = controllers.call_async(ListControllers.Request())
+            spin(node, listed.done)
+            found = {c.name: c.state for c in listed.result().controller}
+            if all(found.get(name) == state for name, state in required.items()):
+                break
+            assert time.monotonic() < controller_deadline, found
+            spin(node, lambda: False, timeout=.2)
+        node.destroy_client(controllers)
         observed = panels[-1].pose.position
         np.testing.assert_allclose([observed.x, observed.y, observed.z], [.82, .19, 0], atol=.002)
         print('PASS rendered image -> calibrated registration in arm base (<=2 mm)', flush=True)
@@ -165,10 +195,10 @@ def main():
         result = handle.get_result_async()
         count = len(states)
         spin(node, lambda: len(states) > count + 5)
-        call(node, SetBool, '/sim/feedback_enabled', SetBool.Request(data=False))
+        switch_broadcaster(node, False)
         spin(node, result.done)
         assert not result.result().result.success and 'stale' in result.result().result.message.lower()
-        call(node, SetBool, '/sim/feedback_enabled', SetBool.Request(data=True))
+        switch_broadcaster(node, True)
         count = len(states)
         spin(node, lambda: len(states) > count + 10)
         print('PASS stale joint feedback aborts active motion', flush=True)

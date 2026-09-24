@@ -1,4 +1,29 @@
-# Verification — 2026-09-23
+# Verification
+
+## 2026-09-24 ros2_control migration
+
+- Installed ROS 2 Jazzy `ros2_control`, `joint_trajectory_controller`, and
+  `joint_state_broadcaster` into the existing Ubuntu 24.04 WSL environment.
+- The simulator now loads `mock_components/GenericSystem` through
+  `controller_manager`. Both standard controllers activated; the joint-state
+  broadcaster was the sole `/joint_states` publisher. The mock exposes six
+  position/velocity command and state pairs. No CAN or physical motors ran.
+- `sim_smoke_test.py` passed through the standard trajectory action: IK-driven
+  motion, speed bound, TF, image detections, pause and movable panel.
+- `autonomy_smoke_test.py` passed: scanning with hidden tags, registration,
+  three hover targets, panel relocation recovery, mission ownership, action
+  cancellation, joint-feedback loss via broadcaster deactivation, and camera loss.
+  The test explicitly waits for both controllers to become active before starting.
+- `test_core.py`: Windows 148 passed, 2 skipped; Ubuntu 149 passed, 1 skipped.
+  The new test checks that the mock URDF interfaces and controller configuration
+  agree. `ros_smoke_test.py` remains a separate IK/perception/CAN test.
+- The first mock configuration inferred velocity by differentiating position;
+  it reported 0.373 rad/s during a planned 0.35 rad/s motion. Explicit
+  position/velocity commands and mirrored state removed that discrepancy.
+- The real moteus `SystemInterface` plugin, measured limits, safety response,
+  camera extrinsics and physical mission are still outstanding.
+
+## 2026-09-23 baseline
 
 ## Completed
 

@@ -129,11 +129,13 @@ The controller owns this input; the CAN node remains read-only.
 ```text
 RViz target / hover mission -> arm_controller -> /solve_ik
                                            |
-                         /arm/follow_joint_trajectory action
+              /arm_trajectory_controller/follow_joint_trajectory action
                                            |
-                                simulated joint executor
+                           joint_trajectory_controller
                                            |
-                                     /joint_states
+                       ros2_control mock six-joint system
+                                           |
+                        joint_state_broadcaster -> /joint_states
                                            |
                               robot_state_publisher -> TF -> RViz arm
 
